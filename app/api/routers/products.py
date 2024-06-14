@@ -6,27 +6,25 @@ from sqlalchemy.future import select
 from app.api.deps import SessionDep
 from app.models import Product, Brand, Category
 from app.schemas import ProductCreate, ProductOut, ProductSchema
-
+from app.crud.product import get_product_by_id, get_all_products, edit_product_by_id
+from app.utilities.exceptions.http.exc_404 import (
+    http_404_exc_product_id_not_found_request,
+)
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[ProductOut], status_code=status.HTTP_200_OK)
-async def get_all_products(db: SessionDep) -> List[ProductOut]:
-    result = await db.execute(select(Product))
-    products = result.scalars()
+async def get_products(db: SessionDep) -> List[ProductOut]:
+    products = await get_all_products(db=db)
     return products
 
 
 @router.get("/{id}", response_model=ProductOut, status_code=status.HTTP_200_OK)
-async def get_product_by_id(id: int, db: SessionDep) -> ProductOut:
-    result = await db.execute(select(Product).where(Product.id == id))
-    product = result.scalar_one()
+async def get_product(id: int, db: SessionDep) -> ProductOut:
+    product = await get_product_by_id(id=id, db=db)
     if not product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product id: {id} not found",
-        )
+        raise await http_404_exc_product_id_not_found_request(id=id)
 
     return product
 
@@ -37,7 +35,7 @@ async def create_product(product: ProductCreate, db: SessionDep) -> ProductOut:
     existing_brand = result.fetchone()
     if not existing_brand:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Brand id: {product.brand_id} not found",
         )
     result = await db.execute(
@@ -46,8 +44,15 @@ async def create_product(product: ProductCreate, db: SessionDep) -> ProductOut:
     existing_category = result.fetchone()
     if not existing_category:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Category id: {product.category_id} not found",
+        )
+    result = await db.execute(select(Product).where(Product.name == product.name))
+    existing_product = result.scalar_one_or_none()
+    if existing_product:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The name {product.name} already exists",
         )
 
     new_product = Product(**product.model_dump())
@@ -61,33 +66,20 @@ async def create_product(product: ProductCreate, db: SessionDep) -> ProductOut:
 
 @router.put("/{id}", response_model=ProductOut, status_code=status.HTTP_200_OK)
 async def update_product(id: int, product: ProductCreate, db: SessionDep) -> ProductOut:
-    result = await db.execute(select(Product).where(Product.id == id))
-    product_from_db = result.scalar_one()
+    product_from_db = await get_product_by_id(id=id, db=db)
     if not product_from_db:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product id: {id} not found",
-        )
+        raise http_404_exc_product_id_not_found_request(id=id)
 
-    update_data = product.model_dump()
-    for key, value in update_data.items():
-        setattr(product_from_db, key, value)
-
-    await db.commit()
-    await db.refresh(product_from_db)
-
-    return product_from_db
+    return edit_product_by_id(
+        id=id, product=product, product_from_db=product_from_db, db=db
+    )
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_product(id: int, db: SessionDep) -> None:
-    result = await db.execute(select(Product).where(Product.id == id))
-    product = result.scalar_one()
+    product = await get_product_by_id(id=id, db=db)
     if not product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product id: {id} not found",
-        )
+        raise http_404_exc_product_id_not_found_request(id=id)
 
     await db.delete(product)
     await db.commit()
