@@ -17,3 +17,7 @@ async def create_category(category: CategoryCreate, db: SessionDep) -> CategoryO
     await db.refresh(new_category)
 
     return new_category
+
+
+
+     

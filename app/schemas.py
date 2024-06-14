@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Dict
 
 from pydantic import BaseModel
 
@@ -11,7 +11,7 @@ class ProductCreate(BaseModel):
     description: str
     price: int
     stock: int
-    characteristic: Any 
+    characteristic: Dict
 
 
 class ProductOut(ProductCreate):
