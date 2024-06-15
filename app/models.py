@@ -29,8 +29,11 @@ class Product(Base):
         onupdate=func.now(),
     )
 
-    category = relationship("Category", back_populates="products")
-    brand = relationship("Brand", back_populates="products")
+    category: Mapped["Category"] = relationship(back_populates="products")
+    brand: Mapped["Brand"] = relationship(back_populates="products")
+    products_in_carts: Mapped["ProductInCart"] = relationship(
+        back_populates="product", cascade="all, delete-orphan"
+    )
 
 
 class Category(Base):
@@ -48,8 +51,8 @@ class Category(Base):
         onupdate=func.now(),
     )
 
-    products = relationship(
-        "Product", back_populates="category", cascade="all, delete-orphan"
+    products: Mapped["Product"] = relationship(
+        back_populates="category", cascade="all, delete-orphan"
     )
 
 
@@ -68,6 +71,48 @@ class Brand(Base):
         onupdate=func.now(),
     )
 
-    products = relationship(
-        "Product", back_populates="brand", cascade="all, delete-orphan"
+    products: Mapped["Product"] = relationship(
+        back_populates="brand", cascade="all, delete-orphan"
+    )
+
+
+class ProductInCart(Base):
+    __tablename__ = "products_in_carts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE")
+    )
+    quantity: Mapped[int] = mapped_column(nullable=False)
+    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    product: Mapped["Product"] = relationship(back_populates="products_in_carts")
+    cart: Mapped["Cart"] = relationship(back_populates="products_in_carts")
+
+
+class Cart(Base):
+    __tablename__ = "carts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    products_in_carts: Mapped["ProductInCart"] = relationship(
+        back_populates="cart", cascade="all, delete-orphan"
     )
