@@ -40,8 +40,10 @@ async def read_product_by_id(id: int, db: AsyncSession) -> Product:
     return product
 
 
-async def read_all_products(db: AsyncSession) -> List[Product]:
-    result = await db.execute(select(Product))
+async def read_all_products(
+    db: AsyncSession, limit: str | None = None, offset: str | None = None
+) -> List[Product]:
+    result = await db.execute(select(Product).limit(limit).offset(offset))
     products = result.scalars().all()
     if not products:
         raise EntityDoesNotExist("No products available!")

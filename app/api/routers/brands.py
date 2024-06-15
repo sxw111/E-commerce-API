@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 
 from app.api.deps import SessionDep
 from app.models import Brand
-from app.schemas import BrandCreate, BrandOut, BrandSchema
+from app.schemas import BrandCreate, BrandOut
 
 
 router = APIRouter()

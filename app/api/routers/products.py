@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status
 
 from app.api.deps import SessionDep
 from app.schemas import ProductCreate, ProductOut
@@ -35,9 +35,9 @@ async def get_product(id: int, db: SessionDep) -> ProductOut:
 
 
 @router.get("/", response_model=List[ProductOut], status_code=status.HTTP_200_OK)
-async def get_products(db: SessionDep) -> List[ProductOut]:
+async def get_products(db: SessionDep, limit: str | None = None, offset: str | None = None) -> List[ProductOut]:
     try:
-        products = await read_all_products(db=db)
+        products = await read_all_products(db=db, limit=limit, offset=offset)
     except EntityDoesNotExist:
         raise await http_404_exc_no_products_available_request()
 

@@ -2,7 +2,6 @@ from sqlalchemy.future import select
 
 from app.api.deps import SessionDep
 from app.models import Brand
-
 from app.utilities.exceptions.http.exc_404 import (
     http_404_exc_brand_id_not_found_request,
 )
