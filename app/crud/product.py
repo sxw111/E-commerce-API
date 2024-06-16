@@ -11,7 +11,7 @@ from app.crud.category import read_category_by_id
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
 
 
-async def create_new_product(product: ProductCreate, db: SessionDep) -> Product:
+async def create_new_product(db: AsyncSession, product: ProductCreate) -> Product:
     await read_brand_by_id(id=product.brand_id, db=db, return_mode="none")
     await read_category_by_id(id=product.category_id, db=db, return_mode="none")
 
@@ -31,7 +31,7 @@ async def create_new_product(product: ProductCreate, db: SessionDep) -> Product:
     return new_product
 
 
-async def read_product_by_id(id: int, db: AsyncSession) -> Product:
+async def read_product_by_id(db: AsyncSession, id: int) -> Product:
     result = await db.execute(select(Product).where(Product.id == id))
     product = result.scalar_one_or_none()
     if not product:
@@ -51,11 +51,9 @@ async def read_all_products(
 
 
 async def update_product_by_id(
-    id: int, product: ProductCreate, db: SessionDep
+    db: AsyncSession, id: int, product: ProductCreate
 ) -> Product:
     product_from_db = await read_product_by_id(id=id, db=db)
-    if not product_from_db:
-        raise EntityDoesNotExist(f"Product with id `{id}` does not exist!")
 
     update_data = product.model_dump()
     for key, value in update_data.items():
@@ -67,11 +65,8 @@ async def update_product_by_id(
     return product_from_db
 
 
-async def delete_product_by_id(id: int, db: SessionDep) -> None:
+async def delete_product_by_id(db: AsyncSession, id: int) -> None:
     product = await read_product_by_id(id=id, db=db)
-
-    if not product:
-        raise EntityDoesNotExist(f"Product with id `{id}` does not exist!")
 
     await db.delete(product)
     await db.commit()

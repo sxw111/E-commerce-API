@@ -103,6 +103,9 @@ class Cart(Base):
     __tablename__ = "carts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )
@@ -115,4 +118,27 @@ class Cart(Base):
 
     products_in_carts: Mapped["ProductInCart"] = relationship(
         back_populates="cart", cascade="all, delete-orphan"
+    )
+    user: Mapped["User"] = relationship(back_populates="cart")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    cart: Mapped["Cart"] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
     )

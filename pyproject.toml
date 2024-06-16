@@ -13,6 +13,7 @@ sqlalchemy = {version = "^2.0.30", extras = ["asyncio"]}
 passlib = {version = "^1.7.4", extras = ["bcrypt"]}
 asyncpg = "^0.29.0"
 alembic = "^1.13.1"
+python-jose = {version = "^3.3.0", extras = ["cryptography"]}
 
 
 [build-system]

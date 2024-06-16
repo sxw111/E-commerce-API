@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.post("/", response_model=BrandOut, status_code=status.HTTP_201_CREATED)
-async def create_brand(brand: BrandCreate, db: SessionDep) -> BrandOut: 
+async def create_brand(db: SessionDep, brand: BrandCreate) -> BrandOut:
     new_brand = Brand(**brand.model_dump())
 
     db.add(new_brand)
@@ -17,6 +17,3 @@ async def create_brand(brand: BrandCreate, db: SessionDep) -> BrandOut:
     await db.refresh(new_brand)
 
     return new_brand
-
-
-

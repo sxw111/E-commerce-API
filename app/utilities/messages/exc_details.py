@@ -14,5 +14,15 @@ def http_404_no_products_available_details() -> str:
     return f"No products available!"
 
 
-def http_400_name_product_arleady_exist_details(product_name: str) -> str:
-    return f"A product named `{product_name}` already exists"
+def http_400_product_name_details(product_name: str) -> str:
+    return f"Product named `{product_name}` already exists!"
+
+
+# use!!!
+def http_400_username_details(username: str) -> str:
+    return f"User with username `{username}` arleady exist!"
+
+
+# use!!!
+def http_400_email_details(email: str) -> str:
+    return f"User with email `{email}` arleady exist!"

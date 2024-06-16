@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class ProductCreate(BaseModel):
@@ -58,5 +58,19 @@ class BrandSchema(BrandOut):
         from_attributes = True
 
 
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
 
 
+class UserOut(UserCreate):
+    id: int
+
+
+class UserSchema(UserOut):
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
