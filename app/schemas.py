@@ -85,3 +85,9 @@ class TokenData(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+
+
+class UserUpdate(BaseModel):
+    username: str | None
+    email: str | None
+    password: str | None

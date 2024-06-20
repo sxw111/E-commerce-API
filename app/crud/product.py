@@ -16,6 +16,7 @@ async def create_new_product(db: AsyncSession, product: ProductCreate) -> Produc
 
     result = await db.execute(select(Product).where(Product.name == product.name))
     existing_product = result.scalar_one_or_none()
+    
     if existing_product:
         raise EntityAlreadyExists(
             f"Product with name `{product.name}` is arleady exist!"
@@ -23,9 +24,9 @@ async def create_new_product(db: AsyncSession, product: ProductCreate) -> Produc
 
     new_product = Product(**product.model_dump())
 
-    db.add(new_product)
+    db.add(instance=new_product)
     await db.commit()
-    await db.refresh(new_product)
+    await db.refresh(instance=new_product)
 
     return new_product
 
@@ -33,6 +34,7 @@ async def create_new_product(db: AsyncSession, product: ProductCreate) -> Produc
 async def read_product_by_id(db: AsyncSession, id: int) -> Product:
     result = await db.execute(select(Product).where(Product.id == id))
     product = result.scalar_one_or_none()
+
     if not product:
         raise EntityDoesNotExist(f"Product with id `{id}` does not exist!")
 
@@ -44,6 +46,7 @@ async def read_all_products(
 ) -> List[Product]:
     result = await db.execute(select(Product).limit(limit).offset(offset))
     products = result.scalars().all()
+
     if not products:
         raise EntityDoesNotExist("No products available!")
     return products

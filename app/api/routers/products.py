@@ -22,16 +22,6 @@ from app.utilities.exceptions.http.exc_404 import (
 router = APIRouter()
 
 
-@router.get("/{id}", response_model=ProductOut, status_code=status.HTTP_200_OK)
-async def get_product(db: SessionDep, id: int) -> ProductOut:
-    try:
-        product = await read_product_by_id(id=id, db=db)
-    except EntityDoesNotExist:
-        raise await http_404_exc_product_id_not_found_request(id=id)
-
-    return product
-
-
 @router.get("/", response_model=List[ProductOut], status_code=status.HTTP_200_OK)
 async def get_products(
     db: SessionDep, limit: str | None = None, offset: str | None = None
@@ -42,6 +32,16 @@ async def get_products(
         raise await http_404_exc_no_products_available_request()
 
     return products
+
+
+@router.get("/{id}", response_model=ProductOut, status_code=status.HTTP_200_OK)
+async def get_product(db: SessionDep, id: int) -> ProductOut:
+    try:
+        product = await read_product_by_id(id=id, db=db)
+    except EntityDoesNotExist:
+        raise await http_404_exc_product_id_not_found_request(id=id)
+
+    return product
 
 
 @router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
