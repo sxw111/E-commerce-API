@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import SessionDep
-from app.models import Category
-from app.schemas import CategoryCreate, CategoryOut, CategorySchema
+from app.models.db.models import Category
+from app.models.schemas.category import CategoryCreate, CategoryOut
 
 
 router = APIRouter()

@@ -1,13 +1,12 @@
 from typing import List
 
-from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from pydantic import EmailStr
 from sqlalchemy import update
 
-from app.models import User
-from app.schemas import UserCreate, UserOut, UserSchema, UserUpdate
+from app.models.db.models import User
+from app.models.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
 from app.utilities.exceptions.password import PasswordDoesNotMatch

@@ -12,7 +12,7 @@ from app.crud.product import (
 )
 from app.crud.brand import is_brand_exists
 from app.crud.category import is_category_exists
-from app.schemas import ProductCreate, ProductOut
+from app.models.schemas.product import ProductCreate, ProductOut
 from app.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
 from app.utilities.exceptions.http.exc_400 import http_400_exc_bad_product_name_request
 from app.utilities.exceptions.http.exc_404 import (

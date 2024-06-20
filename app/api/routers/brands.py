@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status
 
 from app.api.deps import SessionDep
-from app.models import Brand
-from app.schemas import BrandCreate, BrandOut
+from app.models.db.models import Brand
+from app.models.schemas.brand import BrandCreate, BrandOut
 
 
 router = APIRouter()

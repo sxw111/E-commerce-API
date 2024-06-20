@@ -1,11 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status
 from sqlalchemy.future import select
 
 from app.api.deps import SessionDep, CurrentUser
-from app.models import User
-from app.schemas import UserOut, UserUpdate
+from app.models.schemas.user import UserOut, UserUpdate
 from app.crud.user import (
     read_users,
     read_user_by_id,

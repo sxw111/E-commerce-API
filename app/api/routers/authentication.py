@@ -9,7 +9,8 @@ from app.crud.user import (
     is_username_taken,
     authenticate,
 )
-from app.schemas import UserCreate, UserOut, TokenResponse
+from app.models.schemas.user import UserCreate, UserOut
+from app.models.schemas.jwt_token import TokenResponse
 from app.utilities.exceptions.database import EntityAlreadyExists
 from app.utilities.exceptions.http.exc_400 import (
     http_400_exc_bad_email_request,

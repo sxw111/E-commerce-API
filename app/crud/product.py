@@ -3,10 +3,8 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models import Product
-from app.schemas import ProductCreate
-from app.crud.brand import is_brand_exists
-from app.crud.category import is_category_exists
+from app.models.db.models import Product
+from app.models.schemas.product import ProductCreate
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
 
 

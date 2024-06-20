@@ -1,7 +1,7 @@
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Brand
+from app.models.db.models import Brand
 from app.utilities.exceptions.database import EntityDoesNotExist
 
 
