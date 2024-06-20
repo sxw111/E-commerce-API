@@ -64,8 +64,10 @@ class UserCreate(BaseModel):
     password: str
 
 
-class UserOut(UserCreate):
+class UserOut(BaseModel):
     id: int
+    username: str
+    email: EmailStr
 
 
 class UserSchema(UserOut):
@@ -78,3 +80,8 @@ class UserSchema(UserOut):
 
 class TokenData(BaseModel):
     id: int | None = None
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str

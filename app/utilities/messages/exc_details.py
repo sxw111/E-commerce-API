@@ -26,3 +26,7 @@ def http_400_username_details(username: str) -> str:
 # use!!!
 def http_400_email_details(email: str) -> str:
     return f"User with email `{email}` arleady exist!"
+
+
+def http_400_signup_credentials_details() -> str:
+    return "Signup failed! Recheck all your credentials!"

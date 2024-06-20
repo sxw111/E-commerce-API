@@ -1,15 +1,21 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status, Depends
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.future import select
 
 from app.api.deps import SessionDep
-from app.core.security import get_password_hash
-from app.crud.user import create_new_user, is_email_taken, is_username_taken
-from app.models import User
-from app.schemas import UserCreate, UserOut
-from app.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
+from app.core.security import create_access_token
+from app.crud.user import (
+    create_new_user,
+    is_email_taken,
+    is_username_taken,
+    authenticate,
+)
+from app.schemas import UserCreate, UserOut, TokenResponse
+from app.utilities.exceptions.database import EntityAlreadyExists
 from app.utilities.exceptions.http.exc_400 import (
     http_400_exc_bad_email_request,
     http_400_exc_bad_username_request,
+    http_exc_400_credentials_bad_signup_request,
 )
 
 
@@ -22,6 +28,7 @@ async def signup(db: SessionDep, user: UserCreate) -> UserOut:
         await is_username_taken(db=db, username=user.username)
     except EntityAlreadyExists:
         raise await http_400_exc_bad_username_request(username=user.username)
+
     try:
         await is_email_taken(db=db, email=user.email)
     except EntityAlreadyExists:
@@ -33,4 +40,16 @@ async def signup(db: SessionDep, user: UserCreate) -> UserOut:
 
 
 @router.post("/signin")
-async def signin(): ...
+async def signin(
+    db: SessionDep, user_credentials: OAuth2PasswordRequestForm = Depends()
+) -> TokenResponse:
+    try:
+        user = await authenticate(
+            db=db, email=user_credentials.username, password=user_credentials.password
+        )
+    except Exception:
+        raise await http_exc_400_credentials_bad_signup_request()
+
+    access_token = create_access_token(data={"user_id": user.id})
+
+    return TokenResponse(access_token=access_token, token_type="bearer")

@@ -64,11 +64,11 @@ async def is_email_taken(db: AsyncSession, email: EmailStr) -> bool:
 
     return True
 
-#!!! use it
+
 async def authenticate(db: AsyncSession, email: EmailStr, password: str) -> User:
-        user = await read_user_by_email(db=db, email=email)
-        
-        if not verify_password(password, user.password):
-            raise PasswordDoesNotMatch(f"Invalid password!")
-        
-        return user
+    user = await read_user_by_email(db=db, email=email)
+
+    if not verify_password(password, user.password):
+        raise PasswordDoesNotMatch(f"Invalid password!")
+
+    return user
