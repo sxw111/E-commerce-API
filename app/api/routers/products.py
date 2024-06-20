@@ -10,14 +10,17 @@ from app.crud.product import (
     read_product_by_id,
     update_product_by_id,
 )
+from app.crud.brand import is_brand_exists
+from app.crud.category import is_category_exists
 from app.schemas import ProductCreate, ProductOut
 from app.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
 from app.utilities.exceptions.http.exc_400 import http_400_exc_bad_product_name_request
 from app.utilities.exceptions.http.exc_404 import (
     http_404_exc_no_products_available_request,
     http_404_exc_product_id_not_found_request,
+    http_404_exc_brand_id_not_found_request,
+    http_404_exc_category_id_not_found_request,
 )
-
 
 router = APIRouter()
 
@@ -46,6 +49,16 @@ async def get_product(db: SessionDep, id: int) -> ProductOut:
 
 @router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 async def create_product(db: SessionDep, product: ProductCreate) -> ProductOut:
+    try:
+        await is_brand_exists(db=db, id=product.brand_id)
+    except EntityDoesNotExist:
+        raise await http_404_exc_brand_id_not_found_request(id=id)
+
+    try:
+        await is_category_exists(db=db, id=product.category_id)
+    except EntityDoesNotExist:
+        raise await http_404_exc_category_id_not_found_request(id=id)
+
     try:
         new_product = await create_new_product(product=product, db=db)
     except EntityAlreadyExists:

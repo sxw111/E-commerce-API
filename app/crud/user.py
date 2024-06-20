@@ -26,6 +26,23 @@ async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
     return new_user
 
 
+async def read_users(db: AsyncSession) -> List[User]:
+    result = await db.execute(select(User))
+    users = result.scalars().all()
+
+    return users
+
+
+async def read_user_by_id(db: AsyncSession, id: int) -> User:
+    result = await db.execute(select(User).where(User.id == id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise EntityDoesNotExist(f"User with id `{id}` does not exist!")
+
+    return user
+
+
 async def read_user_by_username(db: AsyncSession, username: str) -> User:
     result = await db.execute(select(User).where(User.username == username))
     user = result.scalar_one_or_none()
@@ -75,23 +92,6 @@ async def authenticate(db: AsyncSession, email: EmailStr, password: str) -> User
     return user
 
 
-async def read_users(db: AsyncSession) -> List[User]:
-    result = await db.execute(select(User))
-    users = result.scalars().all()
-
-    return users
-
-
-async def read_user_by_id(db: AsyncSession, id: int) -> User:
-    result = await db.execute(select(User).where(User.id == id))
-    user = result.scalar_one_or_none()
-
-    if not user:
-        raise EntityDoesNotExist(f"User with id `{id}` does not exist!")
-
-    return user
-
-
 async def update_user_by_id(db: AsyncSession, id: int, user_update: UserUpdate) -> User:
     new_user_data = user_update.model_dump()
 
@@ -127,7 +127,7 @@ async def delete_user_by_id(db: AsyncSession, id: int) -> str:
     if not delete_user:
         raise EntityDoesNotExist(f"User with id `{id}` does not exist!")
 
-    await db.delete(delete_user)
+    await db.delete(instance=delete_user)
     await db.commit()
 
     return f"Account with id '{id}' is successfully deleted!"

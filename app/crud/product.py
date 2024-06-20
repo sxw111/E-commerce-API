@@ -5,18 +5,15 @@ from sqlalchemy.future import select
 
 from app.models import Product
 from app.schemas import ProductCreate
-from app.crud.brand import read_brand_by_id
-from app.crud.category import read_category_by_id
+from app.crud.brand import is_brand_exists
+from app.crud.category import is_category_exists
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
 
 
 async def create_new_product(db: AsyncSession, product: ProductCreate) -> Product:
-    await read_brand_by_id(id=product.brand_id, db=db, return_mode="none")
-    await read_category_by_id(id=product.category_id, db=db, return_mode="none")
-
     result = await db.execute(select(Product).where(Product.name == product.name))
     existing_product = result.scalar_one_or_none()
-    
+
     if existing_product:
         raise EntityAlreadyExists(
             f"Product with name `{product.name}` is arleady exist!"
@@ -62,7 +59,7 @@ async def update_product_by_id(
         setattr(product_from_db, key, value)
 
     await db.commit()
-    await db.refresh(product_from_db)
+    await db.refresh(instance=product_from_db)
 
     return product_from_db
 
@@ -70,7 +67,7 @@ async def update_product_by_id(
 async def delete_product_by_id(db: AsyncSession, id: int) -> None:
     product = await read_product_by_id(id=id, db=db)
 
-    await db.delete(product)
+    await db.delete(instance=product)
     await db.commit()
 
     return None
