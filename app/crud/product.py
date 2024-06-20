@@ -3,7 +3,6 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.api.deps import SessionDep
 from app.models import Product
 from app.schemas import ProductCreate
 from app.crud.brand import read_brand_by_id

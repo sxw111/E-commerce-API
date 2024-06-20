@@ -74,3 +74,7 @@ class UserSchema(UserOut):
 
     class Config:
         from_attributes = True
+
+
+class TokenData(BaseModel):
+    id: int | None = None

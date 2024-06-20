@@ -21,10 +21,3 @@ AsyncSessionLocal = async_sessionmaker(
 
 class Base(DeclarativeBase):
     pass
-
-
-
-
-
-
-

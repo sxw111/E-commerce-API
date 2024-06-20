@@ -3,21 +3,19 @@ from typing import List
 from fastapi import APIRouter, status
 
 from app.api.deps import SessionDep
-from app.schemas import ProductCreate, ProductOut
 from app.crud.product import (
-    read_product_by_id,
-    read_all_products,
-    update_product_by_id,
     create_new_product,
     delete_product_by_id,
+    read_all_products,
+    read_product_by_id,
+    update_product_by_id,
 )
-from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
+from app.schemas import ProductCreate, ProductOut
+from app.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
+from app.utilities.exceptions.http.exc_400 import http_400_exc_bad_product_name_request
 from app.utilities.exceptions.http.exc_404 import (
-    http_404_exc_product_id_not_found_request,
     http_404_exc_no_products_available_request,
-)
-from app.utilities.exceptions.http.exc_400 import (
-    http_400_exc_bad_product_name_request,
+    http_404_exc_product_id_not_found_request,
 )
 
 

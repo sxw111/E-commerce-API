@@ -11,6 +11,7 @@ from app.core.security import get_password_hash, verify_password
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
 from app.utilities.exceptions.password import PasswordDoesNotMatch
 
+
 async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
     hash_password = get_password_hash(user.password)
     user.password = hash_password
@@ -63,7 +64,7 @@ async def is_email_taken(db: AsyncSession, email: EmailStr) -> bool:
 
     return True
 
-
+#!!! use it
 async def authenticate(db: AsyncSession, email: EmailStr, password: str) -> User:
         user = await read_user_by_email(db=db, email=email)
         
