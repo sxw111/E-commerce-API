@@ -9,7 +9,7 @@ from sqlalchemy.future import select
 
 from app.core.config import settings
 from app.core.db import AsyncSessionLocal
-from app.models.db.models import User
+from app.models.db.models import User, Cart
 from app.models.schemas.jwt_token import TokenData
 
 
@@ -27,7 +27,7 @@ SessionDep = Annotated[AsyncSession, Depends(get_db)]
 async def verify_access_token(token: str, credentials_exception) -> TokenData:
     try:
         payload = jwt.decode(
-            token, settings.secret_key, algorithms=[settings.ALGORITHM]
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         user_id = payload.get("user_id")
         if user_id is None:

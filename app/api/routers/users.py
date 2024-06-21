@@ -36,16 +36,8 @@ async def get_user(db: SessionDep, id: int) -> UserOut:
 
 @router.patch("/{id}", response_model=UserOut, status_code=status.HTTP_200_OK)
 async def update_user(
-    db: SessionDep,
-    current_user: CurrentUser,
-    update_username: str | None = None,
-    update_email: str | None = None,
-    update_password: str | None = None,
+    db: SessionDep, current_user: CurrentUser, user_update: UserUpdate
 ) -> UserOut:
-    user_update = UserUpdate(
-        username=update_username, email=update_email, password=update_password
-    )
-
     try:
         updated_user = await update_user_by_id(
             db=db, id=current_user.id, user_update=user_update

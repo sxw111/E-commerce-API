@@ -31,7 +31,7 @@ class Product(Base):
 
     category: Mapped["Category"] = relationship(back_populates="products")
     brand: Mapped["Brand"] = relationship(back_populates="products")
-    cart_items: Mapped["CartItems"] = relationship(
+    cart_items: Mapped["CartItem"] = relationship(
         back_populates="product", cascade="all, delete-orphan"
     )
 
@@ -76,15 +76,15 @@ class Brand(Base):
     )
 
 
-class CartItems(Base):
+class CartItem(Base):
     __tablename__ = "cart_items"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="CASCADE"))
     product_id: Mapped[int] = mapped_column(
         ForeignKey("products.id", ondelete="CASCADE")
     )
     quantity: Mapped[int] = mapped_column(nullable=False)
-    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="CASCADE"))
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )
@@ -116,7 +116,7 @@ class Cart(Base):
         onupdate=func.now(),
     )
 
-    cart_items: Mapped["CartItems"] = relationship(
+    cart_items: Mapped["CartItem"] = relationship(
         back_populates="cart", cascade="all, delete-orphan"
     )
     user: Mapped["User"] = relationship(back_populates="cart")

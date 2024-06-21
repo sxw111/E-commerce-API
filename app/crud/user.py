@@ -5,11 +5,24 @@ from sqlalchemy.future import select
 from pydantic import EmailStr
 from sqlalchemy import update
 
-from app.models.db.models import User
+from app.models.db.models import User, Cart
 from app.models.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
 from app.utilities.exceptions.password import PasswordDoesNotMatch
+
+
+# async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
+#     hash_password = get_password_hash(user.password)
+#     user.password = hash_password
+
+#     new_user = User(**user.model_dump())
+
+#     db.add(instance=new_user)
+#     await db.commit()
+#     await db.refresh(instance=new_user)
+
+#     return new_user
 
 
 async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
@@ -19,8 +32,14 @@ async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
     new_user = User(**user.model_dump())
 
     db.add(instance=new_user)
+    await db.flush()
+
+    new_cart = Cart(user_id=new_user.id)
+    db.add(instance=new_cart)
+
     await db.commit()
-    await db.refresh(instance=new_user)
+    await db.refresh(new_user)
+    await db.refresh(new_cart)
 
     return new_user
 
@@ -58,35 +77,6 @@ async def read_user_by_email(db: AsyncSession, email: EmailStr) -> User:
 
     if not user:
         raise EntityDoesNotExist(f"User with email `{email}` does not exist!")
-
-    return user
-
-
-async def is_username_taken(db: AsyncSession, username: str) -> bool:
-    result = await db.execute(select(User).where(User.username == username))
-    user = result.scalar_one_or_none()
-
-    if user:
-        raise EntityAlreadyExists(f"The username `{username}` is already taken!")
-
-    return True
-
-
-async def is_email_taken(db: AsyncSession, email: EmailStr) -> bool:
-    result = await db.execute(select(User).where(User.email == email))
-    user = result.scalar_one_or_none()
-
-    if user:
-        raise EntityAlreadyExists(f"The email `{email}` is already registered!")
-
-    return True
-
-
-async def authenticate(db: AsyncSession, email: EmailStr, password: str) -> User:
-    user = await read_user_by_email(db=db, email=email)
-
-    if not verify_password(password, user.password):
-        raise PasswordDoesNotMatch(f"Invalid password!")
 
     return user
 
@@ -130,3 +120,32 @@ async def delete_user_by_id(db: AsyncSession, id: int) -> str:
     await db.commit()
 
     return f"Account with id '{id}' is successfully deleted!"
+
+
+async def authenticate(db: AsyncSession, email: EmailStr, password: str) -> User:
+    user = await read_user_by_email(db=db, email=email)
+
+    if not verify_password(password, user.password):
+        raise PasswordDoesNotMatch(f"Invalid password!")
+
+    return user
+
+
+async def is_username_taken(db: AsyncSession, username: str) -> bool:
+    result = await db.execute(select(User).where(User.username == username))
+    user = result.scalar_one_or_none()
+
+    if user:
+        raise EntityAlreadyExists(f"The username `{username}` is already taken!")
+
+    return True
+
+
+async def is_email_taken(db: AsyncSession, email: EmailStr) -> bool:
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+
+    if user:
+        raise EntityAlreadyExists(f"The email `{email}` is already registered!")
+
+    return True
