@@ -1,7 +1,6 @@
 from typing import List
 
 from fastapi import APIRouter, status
-from sqlalchemy.future import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app.models.schemas.user import UserOut, UserUpdate
@@ -38,7 +37,7 @@ async def get_user(db: SessionDep, id: int) -> UserOut:
 @router.patch("/{id}", response_model=UserOut, status_code=status.HTTP_200_OK)
 async def update_user(
     db: SessionDep,
-    id: int,
+    current_user: CurrentUser,
     update_username: str | None = None,
     update_email: str | None = None,
     update_password: str | None = None,
@@ -48,18 +47,20 @@ async def update_user(
     )
 
     try:
-        updated_user = await update_user_by_id(db=db, id=id, user_update=user_update)
+        updated_user = await update_user_by_id(
+            db=db, id=current_user.id, user_update=user_update
+        )
     except EntityDoesNotExist:
-        raise await http_404_exc_id_not_found_request(id=id)
+        raise await http_404_exc_id_not_found_request(id=current_user.id)
 
     return updated_user
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
-async def delete_user(db: SessionDep, id: int) -> dict[str, str]:
+async def delete_user(db: SessionDep, current_user: CurrentUser) -> dict[str, str]:
     try:
-        deletion_result = await delete_user_by_id(db=db, id=id)
+        deletion_result = await delete_user_by_id(db=db, id=current_user.id)
     except EntityDoesNotExist:
-        raise await http_404_exc_id_not_found_request(id=id)
+        raise await http_404_exc_id_not_found_request(id=current_user.id)
 
     return {"notification": deletion_result}

@@ -31,7 +31,7 @@ class Product(Base):
 
     category: Mapped["Category"] = relationship(back_populates="products")
     brand: Mapped["Brand"] = relationship(back_populates="products")
-    products_in_carts: Mapped["ProductInCart"] = relationship(
+    cart_items: Mapped["CartItems"] = relationship(
         back_populates="product", cascade="all, delete-orphan"
     )
 
@@ -76,8 +76,8 @@ class Brand(Base):
     )
 
 
-class ProductInCart(Base):
-    __tablename__ = "products_in_carts"
+class CartItems(Base):
+    __tablename__ = "cart_items"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     product_id: Mapped[int] = mapped_column(
@@ -95,8 +95,8 @@ class ProductInCart(Base):
         onupdate=func.now(),
     )
 
-    product: Mapped["Product"] = relationship(back_populates="products_in_carts")
-    cart: Mapped["Cart"] = relationship(back_populates="products_in_carts")
+    product: Mapped["Product"] = relationship(back_populates="cart_items")
+    cart: Mapped["Cart"] = relationship(back_populates="cart_items")
 
 
 class Cart(Base):
@@ -116,7 +116,7 @@ class Cart(Base):
         onupdate=func.now(),
     )
 
-    products_in_carts: Mapped["ProductInCart"] = relationship(
+    cart_items: Mapped["CartItems"] = relationship(
         back_populates="cart", cascade="all, delete-orphan"
     )
     user: Mapped["User"] = relationship(back_populates="cart")
