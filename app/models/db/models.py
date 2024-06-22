@@ -1,3 +1,5 @@
+from typing import List
+
 from datetime import datetime
 from sqlalchemy import Text, TIMESTAMP, func, ForeignKey, JSON, Integer
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -29,11 +31,7 @@ class Product(Base):
         onupdate=func.now(),
     )
 
-    category: Mapped["Category"] = relationship(back_populates="products")
-    brand: Mapped["Brand"] = relationship(back_populates="products")
-    cart_items: Mapped["CartItem"] = relationship(
-        back_populates="product", cascade="all, delete-orphan"
-    )
+    cart_items: Mapped[List["CartItem"]] = relationship(cascade="all, delete-orphan")
 
 
 class Category(Base):
@@ -51,9 +49,7 @@ class Category(Base):
         onupdate=func.now(),
     )
 
-    products: Mapped["Product"] = relationship(
-        back_populates="category", cascade="all, delete-orphan"
-    )
+    products: Mapped["Product"] = relationship(cascade="all, delete-orphan")
 
 
 class Brand(Base):
@@ -71,9 +67,7 @@ class Brand(Base):
         onupdate=func.now(),
     )
 
-    products: Mapped["Product"] = relationship(
-        back_populates="brand", cascade="all, delete-orphan"
-    )
+    products: Mapped["Product"] = relationship(cascade="all, delete-orphan")
 
 
 class CartItem(Base):
@@ -95,17 +89,11 @@ class CartItem(Base):
         onupdate=func.now(),
     )
 
-    product: Mapped["Product"] = relationship(back_populates="cart_items")
-    cart: Mapped["Cart"] = relationship(back_populates="cart_items")
-
 
 class Cart(Base):
     __tablename__ = "carts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), unique=True
-    )
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )
@@ -116,9 +104,7 @@ class Cart(Base):
         onupdate=func.now(),
     )
 
-    cart_items: Mapped["CartItem"] = relationship(
-        back_populates="cart", cascade="all, delete-orphan"
-    )
+    cart_items: Mapped[List["CartItem"]] = relationship(cascade="all, delete-orphan")
     user: Mapped["User"] = relationship(back_populates="cart")
 
 
@@ -129,6 +115,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     password: Mapped[str] = mapped_column(nullable=False)
+    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="SET NULL"))
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )
@@ -139,6 +126,4 @@ class User(Base):
         onupdate=func.now(),
     )
 
-    cart: Mapped["Cart"] = relationship(
-        back_populates="user", uselist=False, cascade="all, delete-orphan"
-    )
+    cart: Mapped["Cart"] = relationship(back_populates="user")
