@@ -40,9 +40,9 @@ async def create_cart_item(
 ):
     new_item = CartItem(**item.model_dump(), cart_id=current_user.cart_id)
 
-    db.add(instance=new_item)
+    db.add(new_item)
     await db.commit()
-    await db.refresh(instance=new_item)
+    await db.refresh(new_item)
 
     return new_item
 
@@ -56,7 +56,7 @@ async def delete_cart_item(db: SessionDep, id: int, current_user: CurrentUser):
     )
     cart_item = result.scalar_one_or_none()
 
-    await db.delete(instance=cart_item)
+    await db.delete(cart_item)
     await db.commit()
 
     return None

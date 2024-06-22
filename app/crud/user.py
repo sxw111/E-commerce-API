@@ -92,7 +92,7 @@ async def update_user_by_id(db: AsyncSession, id: int, user_update: UserUpdate) 
 
     await db.execute(statement=update_stmt)
     await db.commit()
-    await db.refresh(instance=update_user)
+    await db.refresh(update_user)
 
     return update_user
 
@@ -104,7 +104,7 @@ async def delete_user_by_id(db: AsyncSession, id: int) -> str:
     if not delete_user:
         raise EntityDoesNotExist(f"User with id `{id}` does not exist!")
 
-    await db.delete(instance=delete_user)
+    await db.delete(delete_user)
     await db.commit()
 
     return f"Account with id '{id}' is successfully deleted!"

@@ -19,9 +19,9 @@ async def create_new_product(db: AsyncSession, product: ProductCreate) -> Produc
 
     new_product = Product(**product.model_dump())
 
-    db.add(instance=new_product)
+    db.add(new_product)
     await db.commit()
-    await db.refresh(instance=new_product)
+    await db.refresh(new_product)
 
     return new_product
 
@@ -57,7 +57,7 @@ async def update_product_by_id(
         setattr(product_from_db, key, value)
 
     await db.commit()
-    await db.refresh(instance=product_from_db)
+    await db.refresh(product_from_db)
 
     return product_from_db
 
@@ -65,7 +65,7 @@ async def update_product_by_id(
 async def delete_product_by_id(db: AsyncSession, id: int) -> None:
     product = await read_product_by_id(id=id, db=db)
 
-    await db.delete(instance=product)
+    await db.delete(product)
     await db.commit()
 
     return None
