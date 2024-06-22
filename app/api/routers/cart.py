@@ -1,12 +1,11 @@
 from typing import List
 
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status
 from sqlalchemy import and_
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 
 from app.api.deps import SessionDep, CurrentUser
-from app.models.db.models import Cart, CartItem
+from app.models.db.models import CartItem
 from app.models.schemas.cart_item import CartItemCreate, CartItemOut
 
 

@@ -9,7 +9,7 @@ from sqlalchemy.future import select
 
 from app.core.config import settings
 from app.core.db import AsyncSessionLocal
-from app.models.db.models import User, Cart
+from app.models.db.models import User
 from app.models.schemas.jwt_token import TokenData
 
 

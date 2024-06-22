@@ -1,9 +1,69 @@
 from typing import List
-
 from datetime import datetime
-from sqlalchemy import Text, TIMESTAMP, func, ForeignKey, JSON, Integer
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+
+from sqlalchemy import TIMESTAMP, ForeignKey, JSON, func
+from sqlalchemy.orm import Mapped, relationship, mapped_column
+
 from app.core.db import Base
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(nullable=False)
+    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    cart: Mapped["Cart"] = relationship(back_populates="user")
+
+
+class Cart(Base):
+    __tablename__ = "carts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    cart_items: Mapped[List["CartItem"]] = relationship(cascade="all, delete-orphan")
+    user: Mapped["User"] = relationship(back_populates="cart")
+
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="CASCADE"))
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE")
+    )
+    quantity: Mapped[int] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
 
 
 class Product(Base):
@@ -34,24 +94,6 @@ class Product(Base):
     cart_items: Mapped[List["CartItem"]] = relationship(cascade="all, delete-orphan")
 
 
-class Category(Base):
-    __tablename__ = "categories"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False, unique=True)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
-
-    products: Mapped["Product"] = relationship(cascade="all, delete-orphan")
-
-
 class Brand(Base):
     __tablename__ = "brands"
 
@@ -70,15 +112,11 @@ class Brand(Base):
     products: Mapped["Product"] = relationship(cascade="all, delete-orphan")
 
 
-class CartItem(Base):
-    __tablename__ = "cart_items"
+class Category(Base):
+    __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="CASCADE"))
-    product_id: Mapped[int] = mapped_column(
-        ForeignKey("products.id", ondelete="CASCADE")
-    )
-    quantity: Mapped[int] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )
@@ -89,41 +127,4 @@ class CartItem(Base):
         onupdate=func.now(),
     )
 
-
-class Cart(Base):
-    __tablename__ = "carts"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
-
-    cart_items: Mapped[List["CartItem"]] = relationship(cascade="all, delete-orphan")
-    user: Mapped["User"] = relationship(back_populates="cart")
-
-
-class User(Base):
-    __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(nullable=False, unique=True)
-    email: Mapped[str] = mapped_column(nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(nullable=False)
-    cart_id: Mapped[int] = mapped_column(ForeignKey("carts.id", ondelete="SET NULL"))
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
-
-    cart: Mapped["Cart"] = relationship(back_populates="user")
+    products: Mapped["Product"] = relationship(cascade="all, delete-orphan")
