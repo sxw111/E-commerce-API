@@ -6,6 +6,7 @@ from sqlalchemy.future import select
 from app.models.db.models import Product
 from app.models.schemas.product import ProductCreate
 from app.utilities.exceptions.database import EntityDoesNotExist, EntityAlreadyExists
+from app.utilities.exceptions.stock import InsufficientStockError
 
 
 async def create_new_product(db: AsyncSession, product: ProductCreate) -> Product:
@@ -69,3 +70,24 @@ async def delete_product_by_id(db: AsyncSession, id: int) -> None:
     await db.commit()
 
     return None
+
+
+async def is_product_exists(db: AsyncSession, product_id: int) -> bool:
+    result = await db.execute(select(Product).where(Product.id == product_id))
+    product = result.scalar_one_or_none()
+
+    if not product:
+        raise EntityDoesNotExist(f"Product with id `{id}` does not exist!")
+
+    return True
+
+
+async def ensure_product_stock(
+    db: AsyncSession, product_id: int, quantity: int
+) -> bool:
+    product = await read_product_by_id(db=db, id=product_id)
+
+    if product.stock < quantity:
+        raise InsufficientStockError(f"Not enough product in stock")
+
+    return True

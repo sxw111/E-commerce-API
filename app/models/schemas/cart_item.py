@@ -8,6 +8,10 @@ class CartItemCreate(BaseModel):
     quantity: int
 
 
+class CartItemUpdate(BaseModel):
+    quantity: int
+
+
 class CartItemOut(BaseModel):
     id: int
     cart_id: int

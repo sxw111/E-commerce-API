@@ -15,20 +15,20 @@ from app.utilities.exceptions.password import PasswordDoesNotMatch
 async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
     hash_password = get_password_hash(user.password)
     user.password = hash_password
-    
+
     new_user = User(**user.model_dump())
-    
+
     new_cart = Cart()
     db.add(new_cart)
     await db.flush()
-    
+
     new_user.cart_id = new_cart.id
     db.add(new_user)
 
-    await db.commit() 
+    await db.commit()
     await db.refresh(new_user)
     await db.refresh(new_cart)
-    
+
     return new_user
 
 
