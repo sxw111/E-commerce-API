@@ -66,7 +66,7 @@ async def is_product_already_in_cart(
 
 async def read_cart_items(db: AsyncSession, cart_id: int) -> List[CartItem]:
     result = await db.execute(select(CartItem).where(CartItem.cart_id == cart_id))
-    cart_item = result.scalar_one_or_none()
+    cart_item = result.scalars().all()
 
     if not cart_item:
         raise EntityDoesNotExist("No items in cart!")
@@ -92,7 +92,7 @@ async def read_cart_item_by_id(db: AsyncSession, id: int, cart_id: int) -> CartI
 
 
 async def delete_cart_item_by_id(db: AsyncSession, id: int, cart_id: int) -> None:
-    cart_item = await read_cart_item_by_id(db=db, id=int, cart_id=cart_id)
+    cart_item = await read_cart_item_by_id(db=db, id=id, cart_id=cart_id)
 
     await db.delete(cart_item)
     await db.commit()
