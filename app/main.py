@@ -1,25 +1,36 @@
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
+import uvicorn
 from fastapi import FastAPI
-from app.core.db import engine
-from app.models.db.models import Base
+from starlette.middleware.cors import CORSMiddleware
 
 from app.api.endpoints import api_router
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_application: FastAPI) -> AsyncGenerator:
+    # Startup
+    yield
+    # Shutdown
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(api_router)
 
 
-async def create_all_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        print("Tables created successfully.")
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE"),
+)
 
 
-@app.on_event("startup")
-async def startup_event():
-    await create_all_tables()
+@app.get("/")
+async def root():
+    return "Server is running"
+
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

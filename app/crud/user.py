@@ -29,14 +29,14 @@ async def create_new_user(db: AsyncSession, user: UserCreate) -> User:
     await db.refresh(new_user)
     await db.refresh(new_cart)
 
-    return new_user
+    return new_user # type: ignore
 
 
 async def read_users(db: AsyncSession) -> List[User]:
     result = await db.execute(select(User))
     users = result.scalars().all()
 
-    return users
+    return users # type: ignore
 
 
 async def read_user_by_id(db: AsyncSession, id: int) -> User:
@@ -46,7 +46,7 @@ async def read_user_by_id(db: AsyncSession, id: int) -> User:
     if not user:
         raise EntityDoesNotExist(f"User with id `{id}` does not exist!")
 
-    return user
+    return user # type: ignore
 
 
 async def read_user_by_username(db: AsyncSession, username: str) -> User:
@@ -56,7 +56,7 @@ async def read_user_by_username(db: AsyncSession, username: str) -> User:
     if not user:
         raise EntityDoesNotExist(f"User with username `{username}` does not exist!")
 
-    return user
+    return user # type: ignore
 
 
 async def read_user_by_email(db: AsyncSession, email: EmailStr) -> User:
@@ -66,7 +66,7 @@ async def read_user_by_email(db: AsyncSession, email: EmailStr) -> User:
     if not user:
         raise EntityDoesNotExist(f"User with email `{email}` does not exist!")
 
-    return user
+    return user # type: ignore
 
 
 async def update_user_by_id(db: AsyncSession, id: int, user_update: UserUpdate) -> User:

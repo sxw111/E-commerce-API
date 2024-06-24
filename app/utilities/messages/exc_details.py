@@ -34,9 +34,6 @@ def http_404_id_details(id: int) -> str:
     return f"User with id `{id}` does not exist!"
 
 
-###
-
-
 def http_404_cart_item_id_details(id: int) -> str:
     return f"Cart item with id `{id}` does not exist!"
 

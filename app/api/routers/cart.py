@@ -26,6 +26,7 @@ from app.utilities.exceptions.http.exc_400 import (
     http_exc_400_bad_product_quantity_request,
 )
 
+
 router = APIRouter()
 
 

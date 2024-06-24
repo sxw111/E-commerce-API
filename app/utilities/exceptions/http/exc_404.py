@@ -44,9 +44,6 @@ async def http_404_exc_id_not_found_request(id: int) -> Exception:
     )
 
 
-###
-
-
 async def http_404_exc_cart_item_id_not_found_request(id: int) -> Exception:
     return HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
