@@ -40,14 +40,6 @@ test = ["anyio", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypothesis
 trio = ["trio (>=0.23)"]
 
 [[package]]
-name = "async-timeout"
-version = "4.0.3"
-description = "Timeout context manager for asyncio programs"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "asyncpg"
 version = "0.29.0"
 description = "An asyncio PostgreSQL driver"
@@ -173,17 +165,6 @@ python-versions = ">=3.8"
 [package.dependencies]
 dnspython = ">=2.0.0"
 idna = ">=2.0.0"
-
-[[package]]
-name = "exceptiongroup"
-version = "1.2.1"
-description = "Backport of PEP 654 (exception groups)"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-test = ["pytest (>=6)"]
 
 [[package]]
 name = "fastapi"
@@ -729,13 +710,12 @@ python-versions = ">=3.8"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.12"
-content-hash = "1b742f88c95aa898358a6d4466d0e54317ae3eb94748c770794714069254f5ff"
+content-hash = "c235aaa56296a7e838a00cf88f0b79131a00e2d3f38cc53336c39cac3b619449"
 
 [metadata.files]
 alembic = []
 annotated-types = []
 anyio = []
-async-timeout = []
 asyncpg = []
 bcrypt = []
 certifi = []
@@ -746,7 +726,6 @@ cryptography = []
 dnspython = []
 ecdsa = []
 email-validator = []
-exceptiongroup = []
 fastapi = []
 fastapi-cli = []
 greenlet = []
