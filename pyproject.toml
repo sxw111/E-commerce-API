@@ -5,6 +5,7 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
+
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = {version = "^0.111.0", extras = ["all"]}
@@ -14,7 +15,8 @@ passlib = {version = "^1.7.4", extras = ["bcrypt"]}
 asyncpg = "^0.29.0"
 alembic = "^1.13.1"
 python-jose = {version = "^3.3.0", extras = ["cryptography"]}
-pytest = "^8.2.2"
+exceptiongroup = "^1.2.1"
+async-timeout = "^4.0.3"
 
 
 [build-system]
