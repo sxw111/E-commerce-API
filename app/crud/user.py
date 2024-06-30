@@ -126,7 +126,7 @@ async def is_username_taken(db: AsyncSession, username: str) -> bool:
     if user:
         raise EntityAlreadyExists(f"The username `{username}` is already taken!")
 
-    return True
+    return False
 
 
 async def is_email_taken(db: AsyncSession, email: EmailStr) -> bool:
@@ -136,4 +136,4 @@ async def is_email_taken(db: AsyncSession, email: EmailStr) -> bool:
     if user:
         raise EntityAlreadyExists(f"The email `{email}` is already registered!")
 
-    return True
+    return False
